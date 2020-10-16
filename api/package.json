@@ -23,22 +23,5 @@
   },
   "dependencies": {
     "express": "^4.17.1"
-  },
-  "lint-staged": {
-    "*.ts": [
-      "standardx --fix",
-      "git add"
-    ],
-    "*.js": [
-      "standardx --fix",
-      "git add"
-    ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": [
-        "lint-staged"
-      ]
-    }
   }
 }
