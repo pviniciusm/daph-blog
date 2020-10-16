@@ -30,7 +30,7 @@
   },
   "husky": {
     "pre-commit":[
-      "lint-staged"
+      "npm test"
     ]
   }
 }
