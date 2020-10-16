@@ -1,0 +1,12 @@
+{
+    "extends": "standard",
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+        "@typescript-eslint/eslint-plugin" 
+    ],
+    "rules": {
+        "semi": [2, "always"],
+        "no-unused-vars": "off",
+        "@typescript-eslint/no-unused-vars": "error"
+    }
+}

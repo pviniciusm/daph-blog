@@ -4,11 +4,11 @@ import express from 'express';
 class Router {
   protected router: express.Router;
 
-  constructor() {
+  constructor () {
     this.router = express.Router();
   }
 
-  protected route(data: any, res: any, method: any) {
+  protected route (data: any, res: any, method: any) {
     try {
       const ret: Return = method(data);
       return ret.ok ? ApiReturn.success(res, ret) : ApiReturn.failure(res, ret);
@@ -25,7 +25,7 @@ class Router {
   adapt = (req: any) => {
     return {
       body: req.body,
-      header: req.header,
+      header: req.header
     };
   };
 
