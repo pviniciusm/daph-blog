@@ -25,12 +25,14 @@
   },
   "lint-staged": {
     "*.ts": [
-      "standardx"
+      "standardx --fix"
     ]
   },
   "husky": {
-    "pre-commit": [
-      "npm test"
-    ]
+    "hooks": {
+      "pre-commit": [
+        "lint-staged"
+      ]
+    }
   }
 }

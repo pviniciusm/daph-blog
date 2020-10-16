@@ -39,10 +39,3 @@ class UserRouter extends Router {
 }
 
 export default UserRouter;
-
-
-
-
-
-
-
