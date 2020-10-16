@@ -33,7 +33,7 @@ class UserRouter extends Router {
     const controller = new UserController();
 
     // POSTs
-    this.get('/', controller.getUser);
+    this.get('/us', controller.getUser);
     this.get('/create', controller.create);
   }
 }
