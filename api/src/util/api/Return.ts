@@ -39,7 +39,7 @@ class Return {
       data: this.data,
       message: this.message,
       ok: this.ok,
-      exception: this.isException,
+      exception: this.isException
     };
   };
 }

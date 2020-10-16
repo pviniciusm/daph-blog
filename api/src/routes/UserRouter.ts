@@ -2,7 +2,7 @@ import { Return } from '../util/api';
 import Router from './Router';
 
 class UserController {
-  create() {
+  create () {
     try {
       let a = 1;
       a = a * 2;
@@ -13,14 +13,14 @@ class UserController {
     }
   }
 
-  getUser() {
+  getUser () {
     return new Return().success(
       {
         user: {
           name: 'daphne',
           email: 'daphne@au.au.com',
-          password: '126435',
-        },
+          password: '126435'
+        }
       },
       'Operacao realizada com sucesso.'
     );
@@ -28,7 +28,7 @@ class UserController {
 }
 
 class UserRouter extends Router {
-  constructor() {
+  constructor () {
     super();
     const controller = new UserController();
 
@@ -39,3 +39,6 @@ class UserRouter extends Router {
 }
 
 export default UserRouter;
+
+
+
