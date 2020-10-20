@@ -1,24 +1,25 @@
-import { Return, RequiredFieldError, Success, RequiredFieldException } from '../../util/messages';
+import { Return } from '../../util/messages';
+import Infra from '../../util';
 
 class LoginController {
   login (request: any): Return {
     if (!request) {
-      return new RequiredFieldException('Request');
+      return new Infra.RequiredFieldException('Request');
     }
 
     if (!request.email) {
-      return new RequiredFieldError('email');
+      return new Infra.RequiredFieldError('email');
     }
 
     if (!request.password) {
-      return new RequiredFieldError('password');
+      return new Infra.RequiredFieldError('password');
     }
 
-    return new Success(true, 'Operação realizada com sucesso');
+    return new Infra.Success(true, 'Operação realizada com sucesso');
   }
 }
 
-describe('Login contoller', () => {
+describe('Login controller tests', () => {
   test('should return 400 if no email is provided', () => {
     const sut = new LoginController();
     const ret: Return = sut.login({
