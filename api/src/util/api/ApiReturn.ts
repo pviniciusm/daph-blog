@@ -1,4 +1,4 @@
-import Return from './Return';
+import Return from '../messages/Return';
 
 class ApiReturn {
   static success (res: any, data: Return, code?: number) {
