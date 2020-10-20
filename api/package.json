@@ -4,13 +4,14 @@
   "description": "Back-end for daph blog",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --watchAll",
     "dev": "ts-node-dev --ignore-watch node_modules src/main.ts"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@types/express": "^4.17.8",
+    "@types/jest": "^26.0.14",
     "@types/node": "^14.11.2",
     "@typescript-eslint/eslint-plugin": "^4.4.1",
     "@typescript-eslint/parser": "^4.4.1",
@@ -18,10 +19,16 @@
     "jest": "^26.5.3",
     "lint-staged": "^10.4.1",
     "standardx": "^5.0.0",
+    "ts-jest": "^26.4.1",
     "ts-node-dev": "^1.0.0-pre.63",
     "typescript": "^4.0.3"
   },
   "dependencies": {
     "express": "^4.17.1"
+  },
+  "standard": {
+    "env": {
+      "jest": true
+    }
   }
 }
