@@ -5,7 +5,7 @@ class Return {
   public isException: boolean;
   public code: Number;
 
-  constructor (ok: Boolean, code: Number, message: String, data?: any, isException?: Boolean) {
+  constructor (ok: boolean, code: Number, message: String, data?: any, isException?: boolean) {
     this.data = data || undefined;
     this.message = message;
     this.ok = ok;
