@@ -11,7 +11,10 @@
     "baseUrl": ".",
     "paths": {
       "*": ["node_modules/*", "src/types/*"]
-    }
+    },
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "strictPropertyInitialization": false,
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*"],
 }
