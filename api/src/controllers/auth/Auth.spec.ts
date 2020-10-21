@@ -1,5 +1,4 @@
-import { Return } from '../../util/messages';
-import Infra from '../../util';
+import Infra, { Return } from '../../util';
 
 class LoginController {
   login (request: any): Return {

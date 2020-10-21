@@ -12,4 +12,16 @@ class RequiredFieldError extends Error {
   }
 }
 
-export { RequiredFieldError, Error };
+class InvalidFieldError extends Error {
+  constructor (field: String, reason?: String) {
+    const defaultCode = 402;
+
+    if (reason) {
+      super(field + '' + reason, defaultCode);
+    } else {
+      super(field + ' is invalid.', defaultCode);
+    }
+  }
+}
+
+export { RequiredFieldError, InvalidFieldError, Error };

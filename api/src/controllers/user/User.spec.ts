@@ -1,5 +1,11 @@
-import { Return } from '../../util/messages';
-import Infra from '../../util';
+import Infra, { Return } from '../../util';
+
+const validUser = {
+  email: 'email@test.com',
+  password: '12345',
+  name: 'Daphne',
+  lastName: 'the Puppy'
+};
 
 class UserController {
   async create (request: any): Promise<Return> {
@@ -8,20 +14,30 @@ class UserController {
       return new Infra.RequiredFieldException('Request');
     }
 
-    if (!request.email) {
+    const { email, password, name, lastName } = request;
+
+    if (!email) {
       return new Infra.RequiredFieldError('email');
     }
 
-    if (!request.password) {
+    if (!password) {
       return new Infra.RequiredFieldError('password');
     }
 
-    if (!request.name) {
+    if (!name) {
       return new Infra.RequiredFieldError('name');
     }
 
-    if (!request.last_name) {
+    if (!lastName) {
       return new Infra.RequiredFieldError('last_name');
+    }
+    // #endregion
+
+    // #region Validate if fields are valid
+    const strPassword = password.toString();
+
+    if (strPassword.length < 5 || strPassword.length > 50) {
+      return new Infra.InvalidFieldError('Password', 'must have more than 5 characters and less than 50');
     }
     // #endregion
   }
@@ -77,5 +93,25 @@ describe('User controller tests', () => {
 
     expect(ret.ok).toBe(false);
     expect(ret.code).toBe(500);
+  });
+
+  test('should return 402 if password has less than 5 characters', async () => {
+    const sut = new UserController();
+    const user = validUser;
+    user.password = '123';
+
+    const ret = await sut.create(user);
+    expect(ret.ok).toBe(false);
+    expect(ret.code).toBe(402);
+  });
+
+  test('should return 402 if password has more than 50 characters', async () => {
+    const sut = new UserController();
+    const user = validUser;
+    user.password = 'this password is too long so the create method must fail with 402';
+
+    const ret = await sut.create(user);
+    expect(ret.ok).toBe(false);
+    expect(ret.code).toBe(402);
   });
 });

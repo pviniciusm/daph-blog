@@ -1,11 +1,17 @@
-import { Success, RequiredFieldError, RequiredFieldException } from './messages';
+import Return from './messages/Return';
+import Success from './messages/Success';
+import { RequiredFieldError, InvalidFieldError, Error } from './messages/Error';
+import { RequiredFieldException, Exception } from './messages/Exception';
 import { ApiReturn } from './api';
 
 const Infra = {
   Success,
   RequiredFieldError,
+  InvalidFieldError,
+  Error,
   RequiredFieldException,
-  ApiReturn
+  Exception
 };
 
+export { Return, ApiReturn };
 export default Infra;
