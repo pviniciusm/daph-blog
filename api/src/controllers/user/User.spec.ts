@@ -34,10 +34,12 @@ class UserController {
     // #endregion
 
     // #region Validate if fields are valid
-    const strPassword = password.toString();
-
-    if (strPassword.length < 5 || strPassword.length > 50) {
+    if (password.length < 5 || password.length > 50) {
       return new Infra.InvalidFieldError('Password', 'must have more than 5 characters and less than 50');
+    }
+
+    if (email.length < 5 || email.length > 77) {
+      return new Infra.InvalidFieldError('E-mail', 'must have more than 5 characters and less than 77');
     }
     // #endregion
   }
@@ -109,6 +111,26 @@ describe('User controller tests', () => {
     const sut = new UserController();
     const user = validUser;
     user.password = 'this password is too long so the create method must fail with 402';
+
+    const ret = await sut.create(user);
+    expect(ret.ok).toBe(false);
+    expect(ret.code).toBe(402);
+  });
+
+  test('should return 402 if email has less than 5 characters', async () => {
+    const sut = new UserController();
+    const user = validUser;
+    user.email = 'e@ma';
+
+    const ret = await sut.create(user);
+    expect(ret.ok).toBe(false);
+    expect(ret.code).toBe(402);
+  });
+
+  test('should return 402 if email has more than 50 characters', async () => {
+    const sut = new UserController();
+    const user = validUser;
+    user.email = 'an_incredible_big_email@that.wont.pass.the.validation.com';
 
     const ret = await sut.create(user);
     expect(ret.ok).toBe(false);
