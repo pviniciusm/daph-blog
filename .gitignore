@@ -106,3 +106,5 @@ dist
 
 #Visual Studio files
 .vscode/
+
+.sqlite3
