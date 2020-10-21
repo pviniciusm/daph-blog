@@ -1,4 +1,5 @@
-import { ApiReturn, Return } from '../util/api';
+import { ApiReturn } from '../util/api';
+import { Return } from '../util';
 import express from 'express';
 
 class Router {
@@ -8,9 +9,9 @@ class Router {
     this.router = express.Router();
   }
 
-  protected route (data: any, res: any, method: any) {
+  protected async route (data: any, res: any, method: any) {
     try {
-      const ret: Return = method(data);
+      const ret: Return = await method(data);
       return ret.ok ? ApiReturn.success(res, ret) : ApiReturn.failure(res, ret);
     } catch (error) {
       const messageError = error.toString();
@@ -37,7 +38,7 @@ class Router {
 
   protected get = (url: string, method: any) => {
     this.router.get(url, async (req, res) =>
-      this.route(this.adapt(req), res, method)
+      await this.route(this.adapt(req), res, method)
     );
   };
 }

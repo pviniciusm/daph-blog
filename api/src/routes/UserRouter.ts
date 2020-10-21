@@ -1,4 +1,6 @@
-import { Return } from '../util/api';
+import User from '../database/entities/User';
+import { Connection, getConnection, getRepository } from 'typeorm';
+import Infra from '../util';
 import Router from './Router';
 
 class UserController {
@@ -7,19 +9,28 @@ class UserController {
       let a = 1;
       a = a * 2;
 
-      return new Return().success({ data: a });
+      return new Infra.Success({ data: { a } });
     } catch (e) {
-      return new Return().exception();
+      return new Infra.Exception(e.toString());
     }
   }
 
-  getUser () {
-    return new Return().success(
+  async getUser () {
+    const conn:Connection = getConnection();
+    const isconn = conn.isConnected;
+
+    if (!isconn) {
+      return new Infra.Error('Database is not connected', 500);
+    }
+
+    const userRepo = getRepository(User);
+    const users = await userRepo.find();
+
+    return new Infra.Success(
       {
-        user: {
-          name: 'daphne',
-          email: 'daphne@au.au.com',
-          password: '126435'
+        users,
+        connection: {
+          isConnected: isconn, name: conn.name
         }
       },
       'Operacao realizada com sucesso.'
