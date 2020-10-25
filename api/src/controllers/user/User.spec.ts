@@ -1,15 +1,24 @@
+import { UserModel, IUser } from '../../database/entities/User';
+import createDBConn from '../../database/connection';
 import Infra, { Return } from '../../util';
 
-const validUser = {
+const validUser: Partial<IUser> = {
   email: 'email@test.com',
   password: '12345',
   name: 'Daphne',
   lastName: 'the Puppy'
 };
 
+const alreadyRegisteredUser: Partial<IUser> = {
+  email: 'daphne@teste.com',
+  password: '12345',
+  name: 'Daphne',
+  lastName: 'the Puppy'
+};
+
 class UserController {
-  async create (request: any): Promise<Return> {
-    // #region Validação de campos
+  async create (request: Partial<IUser>): Promise<Return> {
+    // #region Fields validation
     if (!request) {
       return new Infra.RequiredFieldException('Request');
     }
@@ -42,10 +51,25 @@ class UserController {
       return new Infra.InvalidFieldError('E-mail', 'must have more than 5 characters and less than 77');
     }
     // #endregion
+
+    // #region Check if user already exists
+    const dbUser: UserModel = new UserModel();
+    const retFindUser: Return = await dbUser.get({
+      email
+    });
+
+    if (retFindUser.ok) {
+      return new Infra.DuplicatedEntryError('User');
+    }
+    // #endregion
   }
 }
 
-describe('User controller tests', () => {
+describe('User create tests', () => {
+  beforeAll(async () => {
+    return await createDBConn();
+  });
+
   test('should return 400 if no email is provided', async () => {
     const sut = new UserController();
     const ret: Return = await sut.create({
@@ -135,5 +159,14 @@ describe('User controller tests', () => {
     const ret = await sut.create(user);
     expect(ret.ok).toBe(false);
     expect(ret.code).toBe(402);
+  });
+
+  test('should return 401 if user is already registered', async () => {
+    const sut = new UserController();
+    const user = alreadyRegisteredUser;
+
+    const ret = await sut.create(user);
+    expect(ret.ok).toBe(false);
+    expect(ret.code).toBe(401);
   });
 });
