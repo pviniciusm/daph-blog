@@ -1,7 +1,7 @@
-import User from '../database/entities/User';
-import { Connection, getConnection, getRepository } from 'typeorm';
+import { Connection, getConnection } from 'typeorm';
 import Infra from '../util';
 import Router from './Router';
+import User, { UserModel } from '../database/entities/User';
 
 class UserController {
   create () {
@@ -23,16 +23,24 @@ class UserController {
       return new Infra.Error('Database is not connected', 500);
     }
 
-    const userRepo = getRepository(User);
-    const users = await userRepo.find();
+    const someUser = new User({});
+    someUser.email = 'daphne@teste.com';
+
+    const dbUser = new UserModel();
+    // const userIn: Partial<IUser> = {
+    //   email: 'daphne@teste.com'
+    // };
+
+    const retUser = await dbUser.get({
+      email: 'daphn2e@teste.com'
+    });
+
+    if (!retUser.ok) {
+      return retUser;
+    }
 
     return new Infra.Success(
-      {
-        users,
-        connection: {
-          isConnected: isconn, name: conn.name
-        }
-      },
+      retUser.data,
       'Operacao realizada com sucesso.'
     );
   }

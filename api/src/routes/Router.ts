@@ -1,5 +1,5 @@
 import { ApiReturn } from '../util/api';
-import { Return } from '../util';
+import Infra, { Return } from '../util';
 import express from 'express';
 
 class Router {
@@ -15,7 +15,7 @@ class Router {
       return ret.ok ? ApiReturn.success(res, ret) : ApiReturn.failure(res, ret);
     } catch (error) {
       const messageError = error.toString();
-      return ApiReturn.exception(res, messageError);
+      return ApiReturn.exception(res, new Infra.Exception(messageError));
     }
   }
 
