@@ -1,4 +1,4 @@
-import { UserModel, IUser } from '../../database/entities/User';
+import UserModel, { IUser } from '../../database/models/UserModel';
 import createDBConn from '../../database/connection';
 import Infra, { Return } from '../../util';
 
@@ -64,15 +64,15 @@ class UserController {
       // #endregion
 
       // #region Check if user already exists
-      const dbUser: UserModel = new UserModel();
-      const retFindUser: Return = await dbUser.get({
+      const userModel: UserModel = new UserModel();
+      const retFindUser: Return = await userModel.get({
         email
       });
 
       if (retFindUser.ok) {
         return new Infra.DuplicatedEntryError('User');
       }
-    // #endregion
+      // #endregion
     } catch (err) {
       return new Infra.Exception(err.toString(), 500);
     }
