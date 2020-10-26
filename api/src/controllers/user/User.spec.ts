@@ -5,6 +5,7 @@ import Infra, { Return } from '../../util';
 const validUser: Partial<IUser> = {
   email: 'email@test.com',
   password: '12345',
+  repeatPassword: '12345',
   name: 'Daphne',
   lastName: 'the Puppy'
 };
@@ -12,6 +13,7 @@ const validUser: Partial<IUser> = {
 const alreadyRegisteredUser: Partial<IUser> = {
   email: 'daphne@teste.com',
   password: '12345',
+  repeatPassword: '12345',
   name: 'Daphne',
   lastName: 'the Puppy'
 };
@@ -24,22 +26,26 @@ class UserController {
         return new Infra.RequiredFieldException('Request');
       }
 
-      const { email, password, name, lastName } = request;
+      const { email, password, repeatPassword, name, lastName } = request;
 
       if (!email) {
-        return new Infra.RequiredFieldError('email');
+        return new Infra.RequiredFieldError('E-mail');
       }
 
       if (!password) {
-        return new Infra.RequiredFieldError('password');
+        return new Infra.RequiredFieldError('Password');
+      }
+
+      if (!repeatPassword) {
+        return new Infra.RequiredFieldError('Repeat Password');
       }
 
       if (!name) {
-        return new Infra.RequiredFieldError('name');
+        return new Infra.RequiredFieldError('Name');
       }
 
       if (!lastName) {
-        return new Infra.RequiredFieldError('last_name');
+        return new Infra.RequiredFieldError('Last Name');
       }
       // #endregion
 
@@ -50,6 +56,10 @@ class UserController {
 
       if (email.length < 5 || email.length > 77) {
         return new Infra.InvalidFieldError('E-mail', 'must have more than 5 characters and less than 77');
+      }
+
+      if (password !== repeatPassword) {
+        return new Infra.InvalidFieldError('Repeat Password', 'must be equal to the Password.');
       }
       // #endregion
 
@@ -143,6 +153,19 @@ describe('User create tests', () => {
     const ret = await sut.create(user);
     expect(ret.ok).toBe(false);
     expect(ret.code).toBe(402);
+  });
+
+  test('should return 402 if password and repeat password are different', async () => {
+    const sut = new UserController();
+    const user = validUser;
+    user.repeatPassword = 'passwords dont match.';
+
+    const ret = await sut.create(user);
+    expect(ret.ok).toBe(false);
+    expect(ret.code).toBe(402);
+
+    expect(ret.identifier).toBeDefined();
+    expect(ret.identifier).toBe('InvalidField');
   });
 
   test('should return 402 if email has less than 5 characters', async () => {

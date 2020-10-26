@@ -5,6 +5,7 @@ import Database from '../Database';
 export interface IUser {
   email: string,
   password: string,
+  repeatPassword: string,
   name: string,
   lastName: string,
   updatedAt: Date,
