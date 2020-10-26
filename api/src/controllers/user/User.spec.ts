@@ -18,50 +18,54 @@ const alreadyRegisteredUser: Partial<IUser> = {
 
 class UserController {
   async create (request: Partial<IUser>): Promise<Return> {
-    // #region Fields validation
-    if (!request) {
-      return new Infra.RequiredFieldException('Request');
-    }
+    try {
+      // #region Fields validation
+      if (!request) {
+        return new Infra.RequiredFieldException('Request');
+      }
 
-    const { email, password, name, lastName } = request;
+      const { email, password, name, lastName } = request;
 
-    if (!email) {
-      return new Infra.RequiredFieldError('email');
-    }
+      if (!email) {
+        return new Infra.RequiredFieldError('email');
+      }
 
-    if (!password) {
-      return new Infra.RequiredFieldError('password');
-    }
+      if (!password) {
+        return new Infra.RequiredFieldError('password');
+      }
 
-    if (!name) {
-      return new Infra.RequiredFieldError('name');
-    }
+      if (!name) {
+        return new Infra.RequiredFieldError('name');
+      }
 
-    if (!lastName) {
-      return new Infra.RequiredFieldError('last_name');
-    }
+      if (!lastName) {
+        return new Infra.RequiredFieldError('last_name');
+      }
+      // #endregion
+
+      // #region Validate if fields are valid
+      if (password.length < 5 || password.length > 50) {
+        return new Infra.InvalidFieldError('Password', 'must have more than 5 characters and less than 50');
+      }
+
+      if (email.length < 5 || email.length > 77) {
+        return new Infra.InvalidFieldError('E-mail', 'must have more than 5 characters and less than 77');
+      }
+      // #endregion
+
+      // #region Check if user already exists
+      const dbUser: UserModel = new UserModel();
+      const retFindUser: Return = await dbUser.get({
+        email
+      });
+
+      if (retFindUser.ok) {
+        return new Infra.DuplicatedEntryError('User');
+      }
     // #endregion
-
-    // #region Validate if fields are valid
-    if (password.length < 5 || password.length > 50) {
-      return new Infra.InvalidFieldError('Password', 'must have more than 5 characters and less than 50');
+    } catch (err) {
+      return new Infra.Exception(err.toString(), 500);
     }
-
-    if (email.length < 5 || email.length > 77) {
-      return new Infra.InvalidFieldError('E-mail', 'must have more than 5 characters and less than 77');
-    }
-    // #endregion
-
-    // #region Check if user already exists
-    const dbUser: UserModel = new UserModel();
-    const retFindUser: Return = await dbUser.get({
-      email
-    });
-
-    if (retFindUser.ok) {
-      return new Infra.DuplicatedEntryError('User');
-    }
-    // #endregion
   }
 }
 
