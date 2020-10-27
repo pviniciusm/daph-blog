@@ -277,3 +277,28 @@ describe.skip('User create tests', () => {
     expect(getRecentlyCreatedUser.data.name).toEqual(user.name);
   });
 });
+
+describe('User get tests', () => {
+  beforeAll(async () => {
+    return await createDBConn();
+  });
+
+  test('should return 400 if email is not provided', async () => {
+    const sut = new UserController();
+    const user = { };
+
+    const ret = await sut.get(user);
+    expect(ret.ok).toBe(false);
+    expect(ret.code).toBe(400);
+    expect(ret.identifier).toEqual('RequiredField');
+  });
+
+  test('should return 500 if no request is provided', async () => {
+    const sut = new UserController();
+
+    const ret = await sut.get(undefined);
+    expect(ret.ok).toBe(false);
+    expect(ret.code).toBe(500);
+    expect(ret.identifier).toEqual('RequiredFieldException');
+  });
+});
