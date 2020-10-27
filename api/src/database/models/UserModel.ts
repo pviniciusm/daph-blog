@@ -35,4 +35,13 @@ export default class UserModel extends Database<User> {
       return new Infra.Exception(ex.toString());
     }
   }
+
+  async create (user: IUser): Promise<Return> {
+    try {
+      const retUser: User = await this.repository.create(user);
+      return new Infra.Success(retUser, 'User successfuly created', 200);
+    } catch (ex) {
+      return new Infra.Exception(ex.toString());
+    }
+  }
 }
