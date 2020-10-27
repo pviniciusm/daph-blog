@@ -18,7 +18,7 @@ class InvalidFieldError extends Error {
     const defaultIdentifier = 'InvalidField';
 
     if (reason) {
-      super(field + '' + reason, defaultCode, defaultIdentifier);
+      super(field + ' ' + reason, defaultCode, defaultIdentifier);
     } else {
       super(field + ' is invalid.', defaultCode, defaultIdentifier);
     }
@@ -31,7 +31,7 @@ class InexistentEntryError extends Error {
     const defaultIdentifier = 'InexistentEntry';
 
     if (message) {
-      super(entry + '' + message, defaultCode, defaultIdentifier);
+      super(entry + ' ' + message, defaultCode, defaultIdentifier);
     } else {
       super(entry + ' was not found.', defaultCode, defaultIdentifier);
     }
@@ -44,7 +44,7 @@ class DuplicatedEntryError extends Error {
     const defaultIdentifier = 'InexistentEntry';
 
     if (message) {
-      super(entry + '' + message, defaultCode, defaultIdentifier);
+      super(entry + ' ' + message, defaultCode, defaultIdentifier);
     } else {
       super(entry + ' was already registered.', defaultCode, defaultIdentifier);
     }
