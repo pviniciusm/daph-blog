@@ -25,6 +25,15 @@ class InvalidFieldError extends Error {
   }
 }
 
+class IncorrectPassword extends Error {
+  constructor () {
+    const defaultCode = 402;
+    const defaultIdentifier = 'IncorrectPassword';
+
+    super('Password is invalid.', defaultCode, defaultIdentifier);
+  }
+}
+
 class InexistentEntryError extends Error {
   constructor (entry: String, message?: String) {
     const defaultCode = 404;
@@ -70,5 +79,6 @@ export {
   InvalidFieldError,
   InexistentEntryError,
   DuplicatedEntryError,
-  RemoveError
+  RemoveError,
+  IncorrectPassword
 };
