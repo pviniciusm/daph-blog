@@ -105,6 +105,24 @@ class UserController {
     }
   }
 
+  async getPassword (request: Partial<IUser>): Promise<Return> {
+    try {
+      if (!request) {
+        return new Infra.RequiredFieldException('Request');
+      }
+
+      const { email } = request;
+
+      if (!email) {
+        return new Infra.RequiredFieldError('E-mail');
+      }
+
+      return await this.model.getPassword({ email });
+    } catch (err) {
+      return new Infra.Exception(err.toString(), 500);
+    }
+  }
+
   async remove (request: Partial<IUser>): Promise<Return> {
     try {
       if (!request) {

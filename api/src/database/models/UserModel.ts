@@ -36,6 +36,24 @@ export default class UserModel extends Database<User> {
     }
   }
 
+  async getPassword (user: Partial<IUser>): Promise<Return> {
+    try {
+      const retUser: User = await this.repository.createQueryBuilder('user')
+        .select(['user.email', 'user.password'])
+        .where('user.email = :email', { email: user.email })
+        .getOne();
+
+      if (!retUser) {
+        return new Infra.InexistentEntryError('User');
+      }
+
+      const obtainedUser : Partial<IUser> = retUser;
+      return new Infra.Success(obtainedUser, 'User was successfully obtained', 201);
+    } catch (ex) {
+      return new Infra.Exception(ex.toString());
+    }
+  }
+
   async remove (user: Partial<IUser>): Promise<Return> {
     try {
       const retUser: User = await this.repository.findOne({
