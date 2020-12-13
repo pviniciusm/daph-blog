@@ -26,8 +26,8 @@ class LoginController {
   }
 }
 
-describe('Login tests', () => {
-  test('should return 400 if no email is provided', () => {
+describe.skip('Login tests', () => {
+  test('should return 400 if no email is provided on login call', () => {
     const sut = new LoginController();
     const ret: Return = sut.login({
       password: 'any_password'
@@ -37,7 +37,7 @@ describe('Login tests', () => {
     expect(ret.code).toBe(400);
   });
 
-  test('should return 400 if no password is provided', () => {
+  test('should return 400 if no password is provided on login call', () => {
     const sut = new LoginController();
     const ret: Return = sut.login({
       email: 'any_email'
@@ -47,7 +47,7 @@ describe('Login tests', () => {
     expect(ret.code).toBe(400);
   });
 
-  test('should return 500 if no request is provided', () => {
+  test('should return 500 if no request is provided on login call', () => {
     const sut = new LoginController();
     const ret = sut.login(undefined);
 

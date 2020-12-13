@@ -1,9 +1,10 @@
 import UserModel, { IUser } from '../../database/models/UserModel';
 import createDBConn from '../../database/connection';
+import connection from '../../database/getConnection';
 import Infra, { Return } from '../../util';
 
 const validUser: Partial<IUser> = {
-  email: 'email@test.com',
+  email: 'email@teste.com',
   password: '123456',
   repeatPassword: '123456',
   name: 'Daphne',
@@ -100,21 +101,52 @@ class UserController {
   }
 
   async get (request: Partial<IUser>): Promise<Return> {
-    if (!request) {
-      return new Infra.RequiredFieldException('Request');
+    try {
+      if (!request) {
+        return new Infra.RequiredFieldException('Request');
+      }
+
+      const { email } = request;
+
+      if (!email) {
+        return new Infra.RequiredFieldError('E-mail');
+      }
+
+      return await this.model.get({ email });
+    } catch (err) {
+      return new Infra.Exception(err.toString(), 500);
     }
+  }
 
-    const { email } = request;
+  async remove (request: Partial<IUser>): Promise<Return> {
+    try {
+      if (!request) {
+        return new Infra.RequiredFieldException('Request');
+      }
 
-    if (!email) {
-      return new Infra.RequiredFieldError('E-mail');
+      const { email } = request;
+
+      if (!email) {
+        return new Infra.RequiredFieldError('E-mail');
+      }
+
+      const retUser: Return = await this.model.get({ email });
+      if (!retUser.ok) {
+        return retUser;
+      }
+
+      return this.model.remove({ email });
+    } catch (err) {
+      return new Infra.Exception(err.toString(), 500);
     }
   }
 }
 
-describe.skip('User create tests', () => {
+describe('User create tests', () => {
   beforeAll(async () => {
-    return await createDBConn();
+    if (!connection()) {
+      return await createDBConn();
+    }
   });
 
   test('should return 400 if no email is provided', async () => {
@@ -273,17 +305,24 @@ describe.skip('User create tests', () => {
       email: user.email
     });
     expect(getRecentlyCreatedUser.ok).toBe(true);
-    expect(getRecentlyCreatedUser.code).toBe(200);
+    expect(getRecentlyCreatedUser.code).toBe(201);
     expect(getRecentlyCreatedUser.data.name).toEqual(user.name);
+
+    const removeUser = await sut.remove({
+      email: user.email
+    });
+    expect(removeUser.ok).toBe(true);
   });
 });
 
 describe('User get tests', () => {
   beforeAll(async () => {
-    return await createDBConn();
+    if (!connection()) {
+      return await createDBConn();
+    }
   });
 
-  test('should return 400 if email is not provided', async () => {
+  test('should return 400 if email is not provided on get call', async () => {
     const sut = new UserController();
     const user = { };
 
@@ -293,12 +332,88 @@ describe('User get tests', () => {
     expect(ret.identifier).toEqual('RequiredField');
   });
 
-  test('should return 500 if no request is provided', async () => {
+  test('should return 500 if no request is provided on get call', async () => {
     const sut = new UserController();
 
     const ret = await sut.get(undefined);
     expect(ret.ok).toBe(false);
     expect(ret.code).toBe(500);
     expect(ret.identifier).toEqual('RequiredFieldException');
+  });
+
+  test('should return 404 if user is not registered', async () => {
+    const sut = new UserController();
+    const user = { ...validUser };
+
+    const ret = await sut.get(user);
+    expect(ret.ok).toBe(false);
+    expect(ret.code).toBe(404);
+    expect(ret.identifier).toEqual('InexistentEntry');
+  });
+
+  test('should return 200 if user returns ok', async () => {
+    const sut = new UserController();
+    const user = { ...alreadyRegisteredUser };
+
+    const ret = await sut.get(user);
+    expect(ret.ok).toBe(true);
+    expect(ret.code).toBe(201);
+
+    expect(ret.data).not.toBeUndefined();
+    expect(ret.data.email).toEqual(user.email);
+    expect(ret.data.password).toBeUndefined();
+  });
+});
+
+describe('User remove tests', () => {
+  beforeAll(async () => {
+    if (!connection()) {
+      return await createDBConn();
+    }
+  });
+
+  test('should return 400 if email is not provided on remove call', async () => {
+    const sut = new UserController();
+    const user = { };
+
+    const ret = await sut.remove(user);
+    expect(ret.ok).toBe(false);
+    expect(ret.code).toBe(400);
+    expect(ret.identifier).toEqual('RequiredField');
+  });
+
+  test('should return 500 if no request is provided on remove call', async () => {
+    const sut = new UserController();
+
+    const ret = await sut.remove(undefined);
+    expect(ret.ok).toBe(false);
+    expect(ret.code).toBe(500);
+    expect(ret.identifier).toEqual('RequiredFieldException');
+  });
+
+  test('should return 404 if user is not registered on remove', async () => {
+    const sut = new UserController();
+    const user = { ...validUser };
+
+    const ret = await sut.remove(user);
+    expect(ret.ok).toBe(false);
+    expect(ret.code).toBe(404);
+    expect(ret.identifier).toEqual('InexistentEntry');
+  });
+
+  test('should return 200 if user remove returns ok', async () => {
+    const sut: UserController = new UserController();
+    const user = { ...alreadyRegisteredUser };
+
+    const ret = await sut.remove(user);
+    expect(ret.ok).toBe(true);
+    expect(ret.code).toBe(200);
+
+    const retRemovedUser = await sut.get(user);
+    expect(retRemovedUser.ok).toBe(false);
+    expect(retRemovedUser.identifier).toBe('InexistentEntry');
+
+    const retCreateUserAgain = await sut.create(user);
+    expect(retCreateUserAgain.ok).toBe(true);
   });
 });

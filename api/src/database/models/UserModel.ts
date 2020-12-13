@@ -29,8 +29,29 @@ export default class UserModel extends Database<User> {
         return new Infra.InexistentEntryError('User');
       }
 
-      const retretUser : Partial<IUser> = retUser;
-      return new Infra.Success(retretUser);
+      const obtainedUser : Partial<IUser> = retUser;
+      return new Infra.Success(obtainedUser, 'User was successfully obtained', 201);
+    } catch (ex) {
+      return new Infra.Exception(ex.toString());
+    }
+  }
+
+  async remove (user: Partial<IUser>): Promise<Return> {
+    try {
+      const retUser: User = await this.repository.findOne({
+        email: user.email
+      });
+
+      if (!retUser) {
+        return new Infra.InexistentEntryError('User');
+      }
+
+      const retRemove = await this.repository.remove([retUser]);
+      if (retRemove.length > 0) {
+        return new Infra.Success(retRemove, 'User was successfully removed', 200);
+      }
+
+      return new Infra.RemoveError('user');
     } catch (ex) {
       return new Infra.Exception(ex.toString());
     }
@@ -38,8 +59,9 @@ export default class UserModel extends Database<User> {
 
   async create (user: IUser): Promise<Return> {
     try {
-      const retUser: User = await this.repository.create(user);
-      return new Infra.Success(retUser, 'User successfuly created', 200);
+      await this.repository.create(user);
+      const retSavedUser: User = await this.repository.save(user);
+      return new Infra.Success(retSavedUser, 'User successfuly created', 201);
     } catch (ex) {
       return new Infra.Exception(ex.toString());
     }

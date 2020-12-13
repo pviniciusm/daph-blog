@@ -51,10 +51,24 @@ class DuplicatedEntryError extends Error {
   }
 }
 
+class RemoveError extends Error {
+  constructor (entry: String, message?: String) {
+    const defaultCode = 405;
+    const defaultIdentifier = 'RemoveError';
+
+    if (message) {
+      super(entry + ' ' + message, defaultCode, defaultIdentifier);
+    } else {
+      super('It was not possible to remove ' + entry, defaultCode, defaultIdentifier);
+    }
+  }
+}
+
 export {
   Error,
   RequiredFieldError,
   InvalidFieldError,
   InexistentEntryError,
-  DuplicatedEntryError
+  DuplicatedEntryError,
+  RemoveError
 };
