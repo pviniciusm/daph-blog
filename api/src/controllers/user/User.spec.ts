@@ -2,6 +2,7 @@ import UserModel, { IUser } from '../../database/models/UserModel';
 import createDBConn from '../../database/connection';
 import connection from '../../database/getConnection';
 import Infra, { Return } from '../../util';
+import bcryptjs from 'bcryptjs';
 
 const validUser: Partial<IUser> = {
   email: 'email@teste.com',
@@ -58,7 +59,7 @@ class UserController {
 
       // #region Validate if fields are valid
       if (password.length < 5 || password.length > 50) {
-        return new Infra.InvalidFieldError('Password', 'must have more than 527 characters and less than 50');
+        return new Infra.InvalidFieldError('Password', 'must have more than 5 characters and less than 50');
       }
 
       if (email.length < 5 || email.length > 77) {
@@ -80,10 +81,14 @@ class UserController {
       }
       // #endregion
 
+      // #region Encrypt password via bcrypt method
+      const encryptedPassword = bcryptjs.hashSync(password, 10);
+      // #endregion
+
       // #region Try to create user on database
       const toCreateUser: IUser = {
         email,
-        password,
+        password: encryptedPassword,
         name,
         lastName
       };
