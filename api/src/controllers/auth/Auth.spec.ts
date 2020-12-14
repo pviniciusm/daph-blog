@@ -1,11 +1,8 @@
-import Infra, { Return } from '../../util';
-import UserController from '../user/User';
+import { Return } from '../../util';
 import connection from '../../database/getConnection';
 import createDBConn from '../../database/connection';
 import { IUser } from '../../database/models/UserModel';
-import bcryptjs from 'bcryptjs';
-import * as jwt from 'jsonwebtoken';
-require('dotenv-safe').config();
+import LoginController from './Auth';
 
 const validUser: Partial<IUser> = {
   email: 'email@teste.com',
@@ -22,55 +19,6 @@ const alreadyRegisteredUser: Partial<IUser> = {
   name: 'Daphne',
   lastName: 'the Puppy'
 };
-
-class LoginController {
-  private userController: UserController;
-
-  constructor () {
-    this.userController = new UserController();
-  }
-
-  async login (request: any): Promise<Return> {
-    if (!request) {
-      return new Infra.RequiredFieldException('Request');
-    }
-
-    if (!request.email) {
-      return new Infra.RequiredFieldError('E-mail');
-    }
-
-    if (!request.password) {
-      return new Infra.RequiredFieldError('Password');
-    }
-
-    // Get user from database
-    const retUser = await this.userController.getPassword(request);
-    if (!retUser.ok) {
-      return retUser;
-    }
-
-    // Check if passwords match
-    const baseUser: IUser = retUser.data;
-    if (!bcryptjs.compareSync(request.password, baseUser.password)) {
-      return new Infra.IncorrectPassword();
-    }
-
-    // Get user data to return
-    const userToReturn = await this.userController.get(request);
-    if (!userToReturn.ok) {
-      return userToReturn;
-    }
-
-    // Create access token
-    const token = jwt.sign(
-      { email: baseUser.email },
-      process.env.SECRET,
-      { expiresIn: '1h' }
-    );
-
-    return new Infra.Success({ ...userToReturn, token: token }, 'Operação realizada com sucesso');
-  }
-}
 
 describe('Login tests', () => {
   beforeAll(async () => {
