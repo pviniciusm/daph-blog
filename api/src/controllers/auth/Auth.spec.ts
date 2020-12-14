@@ -3,9 +3,11 @@ import connection from '../../database/getConnection';
 import createDBConn from '../../database/connection';
 import { IUser } from '../../database/models/UserModel';
 import LoginController from './Auth';
+import UserController from '../user/User';
 
 const validUser: Partial<IUser> = {
   email: 'email@teste.com',
+  username: 'teste',
   password: '123456',
   repeatPassword: '123456',
   name: 'Daphne',
@@ -14,6 +16,7 @@ const validUser: Partial<IUser> = {
 
 const alreadyRegisteredUser: Partial<IUser> = {
   email: 'daphne@teste.com',
+  username: 'daphne',
   password: '12345',
   repeatPassword: '12345',
   name: 'Daphne',
@@ -23,7 +26,14 @@ const alreadyRegisteredUser: Partial<IUser> = {
 describe('Login tests', () => {
   beforeAll(async () => {
     if (!connection()) {
-      return await createDBConn();
+      await createDBConn();
+    }
+
+    const userController = new UserController();
+    const retAlreadyCreated = await userController.get(alreadyRegisteredUser);
+    if (!retAlreadyCreated.ok &&
+      retAlreadyCreated.identifier === 'InexistentEntry') {
+      await userController.create(alreadyRegisteredUser);
     }
   });
 

@@ -16,7 +16,7 @@ class UserController {
         return new Infra.RequiredFieldException('Request');
       }
 
-      const { email, password, repeatPassword, name, lastName } = request;
+      const { email, username, password, repeatPassword, name, lastName } = request;
 
       if (!email) {
         return new Infra.RequiredFieldError('E-mail');
@@ -71,6 +71,7 @@ class UserController {
       const toCreateUser: IUser = {
         email,
         password: encryptedPassword,
+        username,
         name,
         lastName
       };

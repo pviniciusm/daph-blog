@@ -5,6 +5,7 @@ import User from '../entities/User';
 
 export interface IUser {
   email: string,
+  username: string,
   password: string,
   repeatPassword?: string,
   name: string,

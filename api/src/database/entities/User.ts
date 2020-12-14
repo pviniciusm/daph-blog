@@ -10,6 +10,12 @@ export default class User {
 
   @Column({
     type: 'varchar',
+    length: 30
+  })
+  username: string;
+
+  @Column({
+    type: 'varchar',
     length: 50,
     select: false
   })
