@@ -4,6 +4,7 @@ import createDBConn from '../../database/connection';
 import { IUser } from '../../database/models/UserModel';
 import LoginController from './Auth';
 import UserController from '../user/User';
+import '../../util/helpers/matchers';
 
 const validUser: Partial<IUser> = {
   email: 'email@teste.com',
@@ -43,7 +44,7 @@ describe('Login tests', () => {
       password: 'any_password'
     });
 
-    expect(ret.ok).toBe(false);
+    expect(ret).not.toReturnOk();
     expect(ret.code).toBe(400);
   });
 
@@ -53,7 +54,7 @@ describe('Login tests', () => {
       email: 'any_email'
     });
 
-    expect(ret.ok).toBe(false);
+    expect(ret).not.toReturnOk();
     expect(ret.code).toBe(400);
   });
 
@@ -61,7 +62,7 @@ describe('Login tests', () => {
     const sut = new LoginController();
     const ret = await sut.login(undefined);
 
-    expect(ret.ok).toBe(false);
+    expect(ret).not.toReturnOk();
     expect(ret.code).toBe(500);
   });
 
@@ -72,7 +73,7 @@ describe('Login tests', () => {
 
     const ret = await sut.login(user);
 
-    expect(ret.ok).toBe(false);
+    expect(ret).not.toReturnOk();
     expect(ret.code).toBe(404);
     expect(ret.identifier).toBe('InexistentEntry');
   });
@@ -84,7 +85,7 @@ describe('Login tests', () => {
 
     const ret = await sut.login(user);
 
-    expect(ret.ok).toBe(false);
+    expect(ret).not.toReturnOk();
     expect(ret.code).toBe(402);
     expect(ret.identifier).toBe('IncorrectPassword');
   });
@@ -95,7 +96,7 @@ describe('Login tests', () => {
 
     const ret = await sut.login(user);
 
-    expect(ret.ok).toBe(true);
+    expect(ret).toReturnOk();
     expect(ret.code).toBe(200);
     expect(ret.data).not.toBeUndefined();
 

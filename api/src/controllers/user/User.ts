@@ -22,6 +22,10 @@ class UserController {
         return new Infra.RequiredFieldError('E-mail');
       }
 
+      if (!username) {
+        return new Infra.RequiredFieldError('Username');
+      }
+
       if (!password) {
         return new Infra.RequiredFieldError('Password');
       }

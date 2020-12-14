@@ -43,7 +43,7 @@ describe('User create tests', () => {
       password: 'any_password'
     });
 
-    expect(ret.ok).toBe(false);
+    expect(ret).not.toReturnOk();
     expect(ret).toHaveValidCode(400);
   });
 
@@ -53,7 +53,7 @@ describe('User create tests', () => {
       email: 'any_email'
     });
 
-    expect(ret.ok).toBe(false);
+    expect(ret).not.toReturnOk();
     expect(ret).toHaveValidCode(400);
   });
 
@@ -64,7 +64,7 @@ describe('User create tests', () => {
       password: 'any_password'
     });
 
-    expect(ret.ok).toBe(false);
+    expect(ret).not.toReturnOk();
     expect(ret).toHaveValidCode(400);
   });
 
@@ -76,7 +76,7 @@ describe('User create tests', () => {
       name: 'daphne'
     });
 
-    expect(ret.ok).toBe(false);
+    expect(ret).not.toReturnOk();
     expect(ret).toHaveValidCode(400);
   });
 
@@ -84,7 +84,7 @@ describe('User create tests', () => {
     const sut = new UserController();
     const ret: Return = await sut.create(undefined);
 
-    expect(ret.ok).toBe(false);
+    expect(ret).not.toReturnOk();
     expect(ret).toHaveValidCode(500);
   });
 
@@ -94,7 +94,7 @@ describe('User create tests', () => {
     user.password = '123';
 
     const ret = await sut.create(user);
-    expect(ret.ok).toBe(false);
+    expect(ret).not.toReturnOk();
     expect(ret).toHaveValidCode(402);
   });
 
@@ -104,7 +104,7 @@ describe('User create tests', () => {
     user.password = 'this password is too long so the create method must fail with 402';
 
     const ret = await sut.create(user);
-    expect(ret.ok).toBe(false);
+    expect(ret).not.toReturnOk();
     expect(ret).toHaveValidCode(402);
   });
 
@@ -114,7 +114,7 @@ describe('User create tests', () => {
     user.repeatPassword = 'passwords dont match.';
 
     const ret = await sut.create(user);
-    expect(ret.ok).toBe(false);
+    expect(ret).not.toReturnOk();
     expect(ret).toHaveValidCode(402);
 
     expect(ret.identifier).toBeDefined();
@@ -127,7 +127,7 @@ describe('User create tests', () => {
     user.email = 'e@ma';
 
     const ret = await sut.create(user);
-    expect(ret.ok).toBe(false);
+    expect(ret).not.toReturnOk();
     expect(ret).toHaveValidCode(402);
   });
 
@@ -137,7 +137,7 @@ describe('User create tests', () => {
     user.email = 'an_incredible_big_email_that_is_bigger_than_77@wont.pass.the.email.validation.com';
 
     const ret = await sut.create(user);
-    expect(ret.ok).toBe(false);
+    expect(ret).not.toReturnOk();
     expect(ret).toHaveValidCode(402);
   });
 
@@ -146,7 +146,7 @@ describe('User create tests', () => {
     const user = { ...alreadyRegisteredUser };
 
     const ret = await sut.create(user);
-    expect(ret.ok).toBe(false);
+    expect(ret).not.toReturnOk();
     expect(ret).toHaveValidCode(401);
   });
 
@@ -160,7 +160,7 @@ describe('User create tests', () => {
     const user = { ...validUser };
 
     const ret = await sut.create(user);
-    expect(ret.ok).toBe(false);
+    expect(ret).not.toReturnOk();
     expect(ret).toHaveValidCode(406);
     expect(ret.identifier).toBe('MockError');
   });
@@ -175,7 +175,7 @@ describe('User create tests', () => {
     const user = { ...validUser };
 
     const ret = await sut.create(user);
-    expect(ret.ok).toBe(false);
+    expect(ret).not.toReturnOk();
     expect(ret).toHaveValidCode(506);
     expect(ret.identifier).toBe('MockException');
   });
@@ -185,21 +185,32 @@ describe('User create tests', () => {
     const user = { ...validUser };
 
     const ret = await sut.create(user);
-    expect(ret.ok).toBe(true);
+    expect(ret).toReturnOk();
     expect(ret).toHaveValidCode(200);
     expect(ret.data).not.toBeUndefined();
 
     const getRecentlyCreatedUser = await sut.get({
       email: user.email
     });
-    expect(getRecentlyCreatedUser.ok).toBe(true);
+    expect(getRecentlyCreatedUser).toReturnOk();
     expect(getRecentlyCreatedUser.code).toBe(201);
     expect(getRecentlyCreatedUser.data.name).toEqual(user.name);
 
     const removeUser = await sut.remove({
       email: user.email
     });
-    expect(removeUser.ok).toBe(true);
+    expect(removeUser).toReturnOk();
+  });
+
+  test('should return 400 if no username is provided', async () => {
+    const sut = new UserController();
+    const user = { ...alreadyRegisteredUser };
+    user.username = undefined;
+
+    const ret: Return = await sut.create(user);
+    expect(ret).not.toReturnOk();
+    expect(ret).toHaveValidCode(400);
+    expect(ret.identifier).toBe('RequiredField');
   });
 });
 
@@ -215,7 +226,7 @@ describe('User get tests', () => {
     const user = { };
 
     const ret = await sut.get(user);
-    expect(ret.ok).toBe(false);
+    expect(ret).not.toReturnOk();
     expect(ret).toHaveValidCode(400);
     expect(ret.identifier).toEqual('RequiredField');
   });
@@ -224,7 +235,7 @@ describe('User get tests', () => {
     const sut = new UserController();
 
     const ret = await sut.get(undefined);
-    expect(ret.ok).toBe(false);
+    expect(ret).not.toReturnOk();
     expect(ret).toHaveValidCode(500);
     expect(ret.identifier).toEqual('RequiredFieldException');
   });
@@ -234,7 +245,7 @@ describe('User get tests', () => {
     const user = { ...validUser };
 
     const ret = await sut.get(user);
-    expect(ret.ok).toBe(false);
+    expect(ret).not.toReturnOk();
     expect(ret).toHaveValidCode(404);
     expect(ret.identifier).toEqual('InexistentEntry');
   });
@@ -244,7 +255,7 @@ describe('User get tests', () => {
     const user = { ...alreadyRegisteredUser };
 
     const ret = await sut.get(user);
-    expect(ret.ok).toBe(true);
+    expect(ret).toReturnOk();
     expect(ret).toHaveValidCode(201);
 
     expect(ret.data).not.toBeUndefined();
@@ -265,7 +276,7 @@ describe('User remove tests', () => {
     const user = { };
 
     const ret = await sut.remove(user);
-    expect(ret.ok).toBe(false);
+    expect(ret).not.toReturnOk();
     expect(ret).toHaveValidCode(400);
     expect(ret.identifier).toEqual('RequiredField');
   });
@@ -274,7 +285,7 @@ describe('User remove tests', () => {
     const sut = new UserController();
 
     const ret = await sut.remove(undefined);
-    expect(ret.ok).toBe(false);
+    expect(ret).not.toReturnOk();
     expect(ret).toHaveValidCode(500);
     expect(ret.identifier).toEqual('RequiredFieldException');
   });
@@ -284,7 +295,7 @@ describe('User remove tests', () => {
     const user = { ...validUser };
 
     const ret = await sut.remove(user);
-    expect(ret.ok).toBe(false);
+    expect(ret).not.toReturnOk();
     expect(ret).toHaveValidCode(404);
     expect(ret.identifier).toEqual('InexistentEntry');
   });
@@ -294,14 +305,14 @@ describe('User remove tests', () => {
     const user = { ...alreadyRegisteredUser };
 
     const ret = await sut.remove(user);
-    expect(ret.ok).toBe(true);
+    expect(ret).toReturnOk();
     expect(ret).toHaveValidCode(200);
 
     const retRemovedUser = await sut.get(user);
-    expect(retRemovedUser.ok).toBe(false);
+    expect(retRemovedUser).not.toReturnOk();
     expect(retRemovedUser.identifier).toBe('InexistentEntry');
 
     const retCreateUserAgain = await sut.create(user);
-    expect(retCreateUserAgain.ok).toBe(true);
+    expect(retCreateUserAgain).toReturnOk();
   });
 });
