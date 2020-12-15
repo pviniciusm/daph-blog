@@ -7,8 +7,8 @@ class UserRouter extends Router {
     super(new UserController());
 
     // GET
-    this.get('/:email', UserController.prototype.get, ParameterType.Params, [checkAuth]);
-    this.get('/:email/delete', UserController.prototype.remove, ParameterType.Params);
+    this.get('/:username', UserController.prototype.get, ParameterType.Params, [checkAuth]);
+    this.get('/:username/delete', UserController.prototype.remove, ParameterType.Params);
   }
 }
 

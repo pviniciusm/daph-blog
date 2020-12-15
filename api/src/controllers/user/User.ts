@@ -98,13 +98,13 @@ class UserController {
         return new Infra.RequiredFieldException('Request');
       }
 
-      const { email } = request;
+      const { email, username } = request;
 
-      if (!email) {
-        return new Infra.RequiredFieldError('E-mail');
+      if (!email && !username) {
+        return new Infra.RequiredFieldError('E-mail/username');
       }
 
-      return await this.model.get({ email });
+      return await this.model.get({ email, username });
     } catch (err) {
       return new Infra.Exception(err.toString(), 500);
     }

@@ -221,9 +221,11 @@ describe('User get tests', () => {
     }
   });
 
-  test('should return 400 if email is not provided on get call', async () => {
+  test('should return 400 if email and username are not provided on get call', async () => {
     const sut = new UserController();
-    const user = { };
+    const user = { ...validUser };
+    user.email = undefined;
+    user.username = undefined;
 
     const ret = await sut.get(user);
     expect(ret).not.toReturnOk();
@@ -253,6 +255,34 @@ describe('User get tests', () => {
   test('should return 200 if user returns ok', async () => {
     const sut = new UserController();
     const user = { ...alreadyRegisteredUser };
+
+    const ret = await sut.get(user);
+    expect(ret).toReturnOk();
+    expect(ret).toHaveValidCode(201);
+
+    expect(ret.data).not.toBeUndefined();
+    expect(ret.data.email).toEqual(user.email);
+    expect(ret.data.password).toBeUndefined();
+  });
+
+  test('should return 200 if only username is provided (no email)', async () => {
+    const sut = new UserController();
+    const user = { ...alreadyRegisteredUser };
+    user.email = undefined;
+
+    const ret = await sut.get(user);
+    expect(ret).toReturnOk();
+    expect(ret).toHaveValidCode(201);
+
+    expect(ret.data).not.toBeUndefined();
+    expect(ret.data.username).toEqual(user.username);
+    expect(ret.data.password).toBeUndefined();
+  });
+
+  test('should return 200 if only email is provided (no username)', async () => {
+    const sut = new UserController();
+    const user = { ...alreadyRegisteredUser };
+    user.username = undefined;
 
     const ret = await sut.get(user);
     expect(ret).toReturnOk();

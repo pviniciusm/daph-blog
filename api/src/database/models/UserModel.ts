@@ -22,9 +22,14 @@ export default class UserModel extends Database<User> {
 
   async get (user: Partial<IUser>): Promise<Return> {
     try {
-      const retUser: User = await this.repository.findOne({
-        email: user.email
-      });
+      let input = {};
+      if (user.email) {
+        input = { email: user.email };
+      } else {
+        input = { username: user.username };
+      }
+
+      const retUser: User = await this.repository.findOne(input);
 
       if (!retUser) {
         return new Infra.InexistentEntryError('User');
