@@ -1,6 +1,6 @@
 import { ApiReturn } from '../util/api';
 import Infra, { Return } from '../util';
-import express, { Request } from 'express';
+import express, { Request, Response } from 'express';
 
 export enum ParameterType {
   Body = 1,
@@ -45,8 +45,8 @@ class Router {
     }
   };
 
-  protected post = (url: string, method: any, parameter?: ParameterType) => {
-    this.router.post(url, async (req, res) => {
+  protected post = (url: string, method: any, parameter: ParameterType, middlewares?: any[]) => {
+    this.router.post(url, middlewares || [], async (req: Request, res: Response) => {
       await this.route(
         this.adapt(req, parameter),
         res,
@@ -54,8 +54,8 @@ class Router {
     });
   };
 
-  protected get = (url: string, method: any, parameter?: ParameterType) => {
-    this.router.get(url, async (req, res) => {
+  protected get = (url: string, method: any, parameter: ParameterType, middlewares?: any[]) => {
+    this.router.get(url, middlewares || [], async (req: Request, res: Response) => {
       await this.route(
         this.adapt(req, parameter),
         res,
