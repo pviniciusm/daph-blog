@@ -62,6 +62,15 @@ class Router {
         method);
     });
   };
+
+  protected delete = (url: string, method: any, parameter: ParameterType, middlewares?: any[]) => {
+    this.router.delete(url, middlewares || [], async (req: Request, res: Response) => {
+      await this.route(
+        this.adapt(req, parameter),
+        res,
+        method);
+    });
+  };
 }
 
 export default Router;

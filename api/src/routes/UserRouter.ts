@@ -8,7 +8,7 @@ class UserRouter extends Router {
 
     // GET
     this.get('/:username', UserController.prototype.get, ParameterType.Params, [checkAuth]);
-    this.get('/:username/delete', UserController.prototype.remove, ParameterType.Params);
+    this.delete('/:username', UserController.prototype.remove, ParameterType.Params);
   }
 }
 
