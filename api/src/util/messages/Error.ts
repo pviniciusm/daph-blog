@@ -73,6 +73,19 @@ class RemoveError extends Error {
   }
 }
 
+class WrongInformationError extends Error {
+  constructor (entry: String, message?: String) {
+    const defaultCode = 402;
+    const defaultIdentifier = 'WrongInfo';
+
+    if (message) {
+      super(entry + ' ' + message, defaultCode, defaultIdentifier);
+    } else {
+      super(entry + ' is wrong.', defaultCode, defaultIdentifier);
+    }
+  }
+}
+
 export {
   Error,
   RequiredFieldError,
@@ -80,5 +93,6 @@ export {
   InexistentEntryError,
   DuplicatedEntryError,
   RemoveError,
-  IncorrectPassword
+  IncorrectPassword,
+  WrongInformationError
 };

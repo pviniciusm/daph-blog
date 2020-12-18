@@ -2,13 +2,13 @@ import { Column, CreateDateColumn, Entity, PrimaryColumn, UpdateDateColumn } fro
 
 @Entity()
 export default class User {
-  @PrimaryColumn({
+  @Column({
     type: 'varchar',
     length: 77
   })
   email: string;
 
-  @Column({
+  @PrimaryColumn({
     type: 'varchar',
     length: 30
   })
