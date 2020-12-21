@@ -87,18 +87,11 @@ class PostController {
         return retContentValidation;
       }
 
-      let postId: string = title.replace(/\s+/g, '-').toLowerCase();
-
-      const retCountPosts = await this.model.countIds(postId);
-      if (!retCountPosts.ok) {
-        return retCountPosts;
+      const retCreatePostId = await this.createPostId(title);
+      if (!retCreatePostId.ok) {
+        return retCreatePostId;
       }
-
-      if (retCountPosts.data > 0) {
-        postId += `-${retCountPosts.data}`;
-      }
-
-      post.postId = postId;
+      post.postId = retCreatePostId.data;
 
       const retCreatePost = await this.model.create(post);
       if (!retCreatePost.ok) {
@@ -172,13 +165,29 @@ class PostController {
     }
   }
 
-  private postContentValidation = (content: string) : Return => {
+  private postContentValidation = (content: string): Return => {
     if (content.length > 300) {
       return new Infra.InvalidFieldError('Post content', 'must have less than 300 characters');
     }
 
     return new Infra.Success(null);
   };
+
+  private createPostId = async (title: string): Promise<Return> => {
+    let postId: string = title.replace(/\s+/g, '-').toLowerCase();
+
+    const retCountPosts = await this.model.countIds(postId);
+    if (!retCountPosts.ok) {
+      return retCountPosts;
+    }
+
+    if (retCountPosts.data > 0) {
+      postId += `-${retCountPosts.data}`;
+    }
+
+    // post.postId = postId;
+    return new Infra.Success(postId);
+  }
 }
 
 describe('Post get tests', () => {
