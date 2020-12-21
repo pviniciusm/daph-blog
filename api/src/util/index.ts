@@ -3,7 +3,6 @@ import Success from './messages/Success';
 import * as Errors from './messages/Error';
 import * as Exceptions from './messages/Exception';
 import { ApiReturn } from './api';
-import { Interface } from 'readline';
 import _ from 'lodash';
 
 const Infra = {
@@ -14,7 +13,7 @@ const Infra = {
 
 export { Return, ApiReturn };
 
-export function ToInterface<T> (target: Interface): Partial<T> {
+export function ToInterface<T> (target: any): Partial<T> {
   const obtainedPost: Partial<T> = Object
     .keys(target)
     .sort()
