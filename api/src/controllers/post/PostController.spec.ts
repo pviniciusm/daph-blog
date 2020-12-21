@@ -5,6 +5,14 @@ import '../../util/helpers/matchers';
 import UserController from '../user/User';
 import { IUser } from '../../database/models/UserModel';
 
+// Auxiliary function to create a random uuid string
+function uuidv4 () {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    const r = Math.random() * 16 | 0; const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
 const validPost: IPost = {
   postId: 'post-id-nao-deve-ser-este',
   title: 'Primeiro post da daphne',
@@ -159,7 +167,17 @@ class PostController {
         return retContentValidation;
       }
 
-      return new Infra.Success(undefined);
+      const retUpdate = await this.model.update({
+        postId,
+        username,
+        content
+      });
+
+      if (!retUpdate.ok) {
+        return retUpdate;
+      }
+
+      return new Infra.Success(retUpdate.data);
     } catch (ex) {
       return new Infra.Exception(ex.toString());
     }
@@ -501,5 +519,25 @@ describe('Post update tests', () => {
     expect(ret).not.toReturnOk();
     expect(ret).toHaveValidCode(402);
     expect(ret.identifier).toBe('InvalidField');
+  });
+
+  test('update: should return 200 if update is successfull', async () => {
+    const sut = new PostController();
+    const post = { ...alreadyRegisteredPost };
+
+    const newContent = uuidv4();
+    post.content = newContent;
+
+    const ret = await sut.update(post);
+    expect(ret).toReturnOk();
+    expect(ret).toHaveValidCode(200);
+
+    const retPost = await sut.get(post);
+    expect(retPost).toReturnOk();
+    expect(retPost).toHaveValidCode(200);
+    expect(retPost.data).not.toBeUndefined();
+    const basePost: Partial<IPost> = retPost.data;
+
+    expect(basePost.content).toEqual(newContent);
   });
 });

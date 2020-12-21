@@ -88,4 +88,20 @@ export default class PostModel extends Database<Post> {
       return new Infra.Exception(ex.toString());
     }
   }
+
+  async update (post: Partial<IPost>): Promise<Return> {
+    try {
+      const findConditions = {
+        postId: post.postId,
+        user: {
+          username: post.username
+        }
+      };
+
+      const retUpdate = await this.repository.update(findConditions, { content: post.content });
+      return new Infra.Success(retUpdate);
+    } catch (ex) {
+      return new Infra.Exception(ex.toString());
+    }
+  }
 }
