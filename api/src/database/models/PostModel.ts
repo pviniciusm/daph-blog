@@ -1,5 +1,5 @@
 import Infra, { Return, ToInterface } from '../../util';
-import { EntityRepository } from 'typeorm';
+import { EntityRepository, InsertResult, Like } from 'typeorm';
 import Database from '../Database';
 import Post from '../entities/Post';
 import { IUser } from './UserModel';
@@ -7,6 +7,7 @@ import { IUser } from './UserModel';
 export interface IPost {
   postId: string,
   username: string,
+  title: string,
   content: string,
   updatedAt?: Date,
   createdAt?: Date,
@@ -18,24 +19,21 @@ export default class PostModel extends Database<Post> {
   async get (post: Partial<IPost>): Promise<Return> {
     try {
       const retPost = await this.repository.createQueryBuilder('post')
-        .innerJoin('user', 'user')
+        .innerJoin('user', 'user', 'post.username = user.username')
         .select('user.username', 'username')
         .addSelect('post.post_id', 'postId')
         .addSelect('post.content', 'content')
+        .addSelect('post.title', 'title')
         .addSelect('post.updatedAt', 'updatedAt')
         .addSelect('post.createdAt', 'createdAt')
         .addSelect('user.name', 'user.name')
         .where('post.post_id = :postId', { postId: post.postId })
+        .andWhere('user.username = :username', { username: post.username })
         .getRawOne();
 
       if (!retPost) {
         return new Infra.InexistentEntryError('Post');
       }
-
-      // const obtainedPost: Partial<IPost> = Object
-      //   .keys(retPost)
-      //   .sort()
-      //   .reduce((o, k) => _.set(o, k, retPost[k]), {});
 
       const obtainedPost = ToInterface<IPost>(retPost);
 
@@ -55,33 +53,39 @@ export default class PostModel extends Database<Post> {
         return new Infra.InexistentEntryError('Post');
       }
 
-      const retRemove = await this.repository.remove([retPost]);
-      if (retRemove.length > 0) {
-        return new Infra.Success(retRemove, 'Post was successfully removed', 200);
-      }
+      const retRemove = await this.repository.delete({
+        postId: post.postId,
+        user: {
+          username: post.username
+        }
+      });
 
-      return new Infra.RemoveError('post');
+      return new Infra.Success(retRemove, 'Post was successfully removed', 200);
     } catch (ex) {
       return new Infra.Exception(ex.toString());
     }
   }
 
-  async create (post: IPost): Promise<Return> {
+  async create (post: Partial<IPost>): Promise<Return> {
     try {
-      await this.repository.create(post);
-      const retSavedPost: Post = await this.repository.save(post);
-      return new Infra.Success(retSavedPost, 'Post successfuly created', 201);
+      const retSavedPost: InsertResult = await this.repository.insert({ ...post, user: { username: post.username } });
+      const newPost = ToInterface<IPost>(retSavedPost.identifiers[0]);
+
+      return new Infra.Success(newPost, 'Post successfuly created', 201);
     } catch (ex) {
       return new Infra.Exception(ex.toString());
     }
   }
 
-  // async update (post: IPost): Promise<Return> {
-  //   try {
-  //     const retSavedPost: Post = await this.repository.update(post);
-  //     return new Infra.Success(retSavedPost, 'Post successfuly updated', 201);
-  //   } catch (ex) {
-  //     return new Infra.Exception(ex.toString());
-  //   }
-  // }
+  async countIds (postId: string): Promise<Return> {
+    try {
+      const count = await this.repository.count({
+        postId: Like(`${postId}%`)
+      });
+
+      return new Infra.Success(count || 0);
+    } catch (ex) {
+      return new Infra.Exception(ex.toString());
+    }
+  }
 }
