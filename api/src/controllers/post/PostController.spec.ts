@@ -81,6 +81,12 @@ class PostController {
         return retUser;
       }
 
+      // Content validation
+      const retContentValidation = this.postContentValidation(content);
+      if (!retContentValidation.ok) {
+        return retContentValidation;
+      }
+
       let postId: string = title.replace(/\s+/g, '-').toLowerCase();
 
       const retCountPosts = await this.model.countIds(postId);
@@ -149,11 +155,30 @@ class PostController {
         return new Infra.RequiredFieldError('Post content');
       }
 
+      const retPost = await this.get({ postId, username });
+      if (!retPost.ok) {
+        return retPost;
+      }
+
+      // Content validation
+      const retContentValidation = this.postContentValidation(content);
+      if (!retContentValidation.ok) {
+        return retContentValidation;
+      }
+
       return new Infra.Success(undefined);
     } catch (ex) {
       return new Infra.Exception(ex.toString());
     }
   }
+
+  private postContentValidation = (content: string) : Return => {
+    if (content.length > 300) {
+      return new Infra.InvalidFieldError('Post content', 'must have less than 300 characters');
+    }
+
+    return new Infra.Success(null);
+  };
 }
 
 describe('Post get tests', () => {
@@ -240,7 +265,7 @@ describe('Post get tests', () => {
   });
 });
 
-describe.skip('Post create tests', () => {
+describe('Post create tests', () => {
   beforeAll(async () => {
     if (!getConnection()) {
       await createConnection();
@@ -303,7 +328,7 @@ describe.skip('Post create tests', () => {
     expect(ret.identifier).toBe('InexistentEntry');
   });
 
-  test('create: should return 200 if post create is successful', async () => {
+  test.skip('create: should return 200 if post create is successful', async () => {
     const sut = new PostController();
     const post = { ...validPost };
 
@@ -315,6 +340,18 @@ describe.skip('Post create tests', () => {
 
     // tests if postId is replaced by a new one
     expect(ret.data.postId).not.toEqual(validPost.postId);
+  });
+
+  test('create: should return 402 if content length is invalid', async () => {
+    const sut = new PostController();
+    const post = { ...alreadyRegisteredPost };
+    post.content = 'abc'.repeat(101);
+
+    const ret = await sut.create(post);
+
+    expect(ret).not.toReturnOk();
+    expect(ret).toHaveValidCode(402);
+    expect(ret.identifier).toBe('InvalidField');
   });
 });
 
@@ -432,5 +469,28 @@ describe('Post update tests', () => {
     expect(ret).not.toReturnOk();
     expect(ret).toHaveValidCode(400);
     expect(ret.identifier).toBe('RequiredField');
+  });
+
+  test('update: should return 404 if post does not exist', async () => {
+    const sut = new PostController();
+    const post = { ...validPost };
+
+    const ret = await sut.update(post);
+
+    expect(ret).not.toReturnOk();
+    expect(ret).toHaveValidCode(404);
+    expect(ret.identifier).toBe('InexistentEntry');
+  });
+
+  test('update: should return 400 if content length is invalid', async () => {
+    const sut = new PostController();
+    const post = { ...alreadyRegisteredPost };
+    post.content = 'abc'.repeat(101);
+
+    const ret = await sut.update(post);
+
+    expect(ret).not.toReturnOk();
+    expect(ret).toHaveValidCode(402);
+    expect(ret.identifier).toBe('InvalidField');
   });
 });
