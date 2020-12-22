@@ -1,5 +1,11 @@
 import { Column, CreateDateColumn, Entity, PrimaryColumn, UpdateDateColumn } from 'typeorm';
 
+export enum UserRole {
+  ADMIN = 'A',
+  SUPERUSER = 'S',
+  USER = 'U'
+}
+
 @Entity()
 export default class User {
   @Column({
@@ -38,4 +44,10 @@ export default class User {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @Column({
+    type: 'character',
+    default: UserRole.USER
+  })
+  role: UserRole;
 }

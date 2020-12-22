@@ -23,7 +23,7 @@ const alreadyRegisteredUser: Partial<IUser> = {
   lastName: 'the Puppy'
 };
 
-describe.skip('User create tests', () => {
+describe('User create tests', () => {
   beforeAll(async () => {
     if (!connection()) {
       await createDBConn();
@@ -214,7 +214,7 @@ describe.skip('User create tests', () => {
   });
 });
 
-describe.skip('User get tests', () => {
+describe('User get tests', () => {
   beforeAll(async () => {
     if (!connection()) {
       return await createDBConn();
@@ -294,7 +294,7 @@ describe.skip('User get tests', () => {
   });
 });
 
-describe.skip('User remove tests', () => {
+describe('User remove tests', () => {
   beforeAll(async () => {
     if (!connection()) {
       return await createDBConn();

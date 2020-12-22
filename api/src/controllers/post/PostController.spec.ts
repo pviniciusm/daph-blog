@@ -223,6 +223,8 @@ describe('Post get tests', () => {
       username: 'bruna'
     };
     await new UserController().create(bruna);
+
+    await new PostController().create(alreadyRegisteredPost);
   });
 
   test('should return 500 if no request is provided on get call', async () => {
@@ -460,6 +462,18 @@ describe('Post update tests', () => {
     if (!getConnection()) {
       await createConnection();
     }
+
+    const bruna: IUser = {
+      name: 'Bruna',
+      lastName: 'Fonseca',
+      email: 'bruna@teste.com',
+      password: '123456',
+      repeatPassword: '123456',
+      username: 'bruna'
+    };
+    await new UserController().create(bruna);
+
+    await new PostController().create(alreadyRegisteredPost);
   });
 
   test('update: should return 500 if no request is provided', async () => {

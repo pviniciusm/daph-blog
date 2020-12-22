@@ -1,7 +1,7 @@
 import Infra, { Return } from '../../util';
 import { EntityRepository } from 'typeorm';
 import Database from '../Database';
-import User from '../entities/User';
+import User, { UserRole } from '../entities/User';
 
 export interface IUser {
   email: string,
@@ -11,7 +11,8 @@ export interface IUser {
   name: string,
   lastName: string,
   updatedAt?: Date,
-  createdAt?: Date
+  createdAt?: Date,
+  role?: UserRole
 }
 
 @EntityRepository(User)
